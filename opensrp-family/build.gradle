@@ -3,7 +3,7 @@ description = 'OpenSRP family client library'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
@@ -13,6 +13,7 @@ buildscript {
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 jacoco {
     toolVersion = "0.8.0"
@@ -70,16 +71,42 @@ tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
 }
 
+def githubProperties = new Properties()
+if (rootProject.file("github.properties").exists()) {
+    githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+}
+
 allprojects {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         google()
         mavenLocal()
+        maven {
+
+            name = "GitHubPackages"
+
+            url = uri("https://maven.pkg.github.com/Digital-Square-Tanzania/opensrp-client-native-form")
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+
+        }
+
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Digital-Square-Tanzania/opensrp-client-core")
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+
+        }
     }
 }
 
 dependencies {
-    implementation('org.smartregister:opensrp-client-core:4.3.6-SNAPSHOT@aar') {
+    implementation('org.smartregister:opensrp-client-core:1.16.13-ALPHA-NACP-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'com.github.bmelnychuk', module: 'atv'
         exclude group: 'com.google.guava', module: 'guava'
@@ -88,7 +115,7 @@ dependencies {
         exclude group: 'com.ibm.fhir', module: 'fhir-model'
     }
 
-    implementation('org.smartregister:opensrp-client-native-form:2.1.1-SNAPSHOT@aar') {
+    implementation('org.smartregister:opensrp-client-native-form:3.1.8-NACP-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'cardview-v7'
@@ -112,7 +139,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'com.google.guava:guava:28.0-android'
-    implementation 'id.zelory:compressor:2.1.0'
+    implementation 'id.zelory:compressor:2.1.1'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

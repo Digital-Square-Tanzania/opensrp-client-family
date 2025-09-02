@@ -1,5 +1,6 @@
 package org.smartregister.family.activity;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -69,11 +70,11 @@ public class FamilyWizardFormActivity extends JsonWizardFormActivity {
     protected void attachBaseContext(android.content.Context base) {
         // get language from prefs
         String lang = LangUtils.getLanguage(base.getApplicationContext());
-        Configuration newConfiguration = LangUtils.setAppLocale(base, lang);
+        Context context = LangUtils.setAppLocale(base, lang);
 
         super.attachBaseContext(base);
 
-        this.applyOverrideConfiguration(newConfiguration);
+        this.applyOverrideConfiguration(context.getResources().getConfiguration());
     }
 }
 
